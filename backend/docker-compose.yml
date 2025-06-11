@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: meu-mongo
+    ports:
+      - '27017:27017'
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - app-network
+
+  backend:
+    build: .
+    container_name: backend
+    ports:
+      - '3001:3000'
+    environment:
+      - DATABASE_URL=mongodb://mongodb:27017/mydb
+      - PORT=3000
+      - NODE_ENV=development
+    depends_on:
+      - mongodb
+    networks:
+      - app-network
+
+volumes:
+  mongo-data:
+
+networks:
+  app-network:
+    driver: bridge

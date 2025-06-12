@@ -6,6 +6,8 @@ import { ListProductsUseCase } from '@application/use-cases/products/list-produc
 import { GetProductByIdUseCase } from '@application/use-cases/products/get-product-by-id.usecase';
 import { IProductRepository } from '@domain/products/repositories/product.repository';
 import { ProductRepositoryMongo } from '@infrastructure/repositories/product.repository.impl';
+import { UpdateProductUseCase } from '@application/use-cases/products/update-product.usecase';
+import { DeleteProductUseCase } from '@application/use-cases/products/delete-product.usecase';
 import {
   ProductModel,
   ProductSchema,
@@ -22,6 +24,8 @@ import {
     CreateProductUseCase,
     ListProductsUseCase,
     GetProductByIdUseCase,
+    UpdateProductUseCase,
+    DeleteProductUseCase,
     {
       provide: IProductRepository,
       useClass: ProductRepositoryMongo,
@@ -32,6 +36,6 @@ import {
     CreateProductUseCase,
     ListProductsUseCase,
     GetProductByIdUseCase,
-  ], // Export repository for other modules if needed (e.g. ReviewsModule)
+  ],
 })
 export class ProductsModule {}

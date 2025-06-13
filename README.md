@@ -179,8 +179,5 @@ O frontend é uma aplicação Next.js.
 - **Conflitos de Porta:** Se você encontrar erros de `EADDRINUSE`, significa que uma porta (ex: 3000 ou 3001) já está em uso. Certifique-se de que nenhuma outra aplicação esteja usando essas portas, ou ajuste as portas em `package.json` (frontend) ou `docker-compose.yml` (backend).
 - **CORS:** Problemas de Cross-Origin Resource Sharing são tratados no `main.ts` do backend, permitindo explicitamente requisições de `http://localhost:3001`. Se você mudar a porta do frontend, lembre-se de atualizar essa configuração.
 - **Endpoints do Backend:**
-  - Todos os endpoints da API do backend são prefixados com `/api/v1`. Por exemplo, os endpoints relacionados a produtos estão em `/api/v1/products`.
-  - Os campos `category` e `imageUrl` para produtos **não são esperados** pelo backend e foram removidos do `CreateProductDto` do frontend e dos formulários de produto para evitar erros.
-  - O endpoint `reviews/average-rating` foi corrigido no frontend para `reviews/product/:productId/average`.
 
 Aproveite seu Sistema de Avaliação de Produtos!

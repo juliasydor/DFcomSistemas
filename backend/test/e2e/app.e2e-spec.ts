@@ -3,9 +3,6 @@ import { INestApplication, ValidationPipe } from '@nestjs/common';
 import * as request from 'supertest';
 import { AppModule } from '@modules/app.module';
 import { ConfigModule } from '@nestjs/config';
-// It's good practice to use a separate test database or mock the database layer for E2E.
-// For simplicity, this example might hit the actual DB if not configured for testing.
-// Consider using mongodb-memory-server for E2E tests.
 
 describe('AppController (e2e)', () => {
   let app: INestApplication;
@@ -14,11 +11,10 @@ describe('AppController (e2e)', () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [
         AppModule,
-        // Override ConfigModule for testing if needed, e.g., to point to a test DB
         ConfigModule.forRoot({
           isGlobal: true,
-          envFilePath: '.env.test', // Ensure you have a .env.test or similar
-          ignoreEnvFile: process.env.CI ? true : false, // Ignore .env file in CI if vars are set directly
+          envFilePath: '.env.test',
+          ignoreEnvFile: process.env.CI ? true : false,
         }),
       ],
     }).compile();
@@ -32,15 +28,9 @@ describe('AppController (e2e)', () => {
   });
 
   it('/api/v1 (GET health check - if you add one)', () => {
-    // Example: if you add a root GET endpoint to AppModule or a HealthController
-    // return request(app.getHttpServer())
-    //   .get('/api/v1')
-    //   .expect(200)
-    //   .expect('Hello World!'); // Or whatever your root endpoint returns
-    expect(true).toBe(true); // Placeholder if no root endpoint
+    expect(true).toBe(true);
   });
 
-  // Example Product E2E Test
   describe('/products', () => {
     let productId: string;
     const productPayload = {
@@ -55,7 +45,7 @@ describe('AppController (e2e)', () => {
         .post('/api/v1/products')
         .send(productPayload)
         .expect(201)
-        .then((res) => {
+        .then((res: { body: { id: string; name: string } }) => {
           expect(res.body).toHaveProperty('id');
           expect(res.body.name).toEqual(productPayload.name);
           productId = res.body.id;
@@ -66,7 +56,7 @@ describe('AppController (e2e)', () => {
       return request(app.getHttpServer())
         .get('/api/v1/products')
         .expect(200)
-        .then((res) => {
+        .then((res: { body: { length: number } }) => {
           expect(Array.isArray(res.body)).toBe(true);
           expect(res.body.length).toBeGreaterThanOrEqual(1);
         });
@@ -76,26 +66,25 @@ describe('AppController (e2e)', () => {
       return request(app.getHttpServer())
         .get(`/api/v1/products/${productId}`)
         .expect(200)
-        .then((res) => {
+        .then((res: { body: { id: string; name: string } }) => {
           expect(res.body.id).toEqual(productId);
           expect(res.body.name).toEqual(productPayload.name);
         });
     });
   });
 
-  // Example Review E2E Test (assuming a product exists)
   describe('/reviews', () => {
-    let createdProductId: string; // Will be set by creating a product first
+    let createdProductId: string;
     const reviewPayload = {
-      // productId will be set dynamically
       userId: 'e2e-user-123',
       rating: 5,
       comment: 'Excellent product from E2E test!',
     };
 
     beforeAll(async () => {
-      // Create a product to review
-      const productRes = await request(app.getHttpServer())
+      const productRes: { body: { id: string } } = await request(
+        app.getHttpServer(),
+      )
         .post('/api/v1/products')
         .send({
           name: 'Product for Review E2E',
@@ -111,18 +100,22 @@ describe('AppController (e2e)', () => {
         .post('/api/v1/reviews')
         .send({ ...reviewPayload, productId: createdProductId })
         .expect(201)
-        .then((res) => {
-          expect(res.body).toHaveProperty('id');
-          expect(res.body.productId).toEqual(createdProductId);
-          expect(res.body.comment).toEqual(reviewPayload.comment);
-        });
+        .then(
+          (res: {
+            body: { id: string; productId: string; comment: string };
+          }) => {
+            expect(res.body).toHaveProperty('id');
+            expect(res.body.productId).toEqual(createdProductId);
+            expect(res.body.comment).toEqual(reviewPayload.comment);
+          },
+        );
     });
 
     it('(GET) /reviews?productId=:id - should get reviews for a product', () => {
       return request(app.getHttpServer())
         .get(`/api/v1/reviews?productId=${createdProductId}`)
         .expect(200)
-        .then((res) => {
+        .then((res: { body: { productId: string }[] }) => {
           expect(Array.isArray(res.body)).toBe(true);
           expect(res.body.length).toBeGreaterThanOrEqual(1);
           expect(res.body[0].productId).toEqual(createdProductId);
@@ -133,7 +126,7 @@ describe('AppController (e2e)', () => {
       return request(app.getHttpServer())
         .get(`/api/v1/reviews/average-rating/${createdProductId}`)
         .expect(200)
-        .then((res) => {
+        .then((res: { body: { productId: string; averageRating: number } }) => {
           expect(res.body).toHaveProperty('productId', createdProductId);
           expect(res.body).toHaveProperty('averageRating');
           expect(typeof res.body.averageRating).toBe('number');
@@ -142,9 +135,6 @@ describe('AppController (e2e)', () => {
   });
 
   afterAll(async () => {
-    // Optional: Clean up database entries created during tests
-    // This might involve direct DB access or specific cleanup endpoints if you build them.
-    // For mongodb-memory-server, it usually cleans itself up.
     await app.close();
   });
 });

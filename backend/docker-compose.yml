@@ -15,7 +15,7 @@ services:
     build: .
     container_name: backend
     ports:
-      - '3001:3000'
+      - '3000:3000'
     environment:
       - DATABASE_URL=mongodb://mongodb:27017/mydb
       - PORT=3000

@@ -1,4 +1,3 @@
-# Estágio de build
 FROM node:18-alpine AS builder
 WORKDIR /usr/src/app
 COPY package*.json ./
@@ -13,8 +12,6 @@ COPY --from=builder /usr/src/app/node_modules ./node_modules
 COPY --from=builder /usr/src/app/dist ./dist
 COPY package*.json ./
 
-# Variável de ambiente para a URL do banco de dados será injetada pelo docker-compose
-# ENV DATABASE_URL=mongodb://mongodb:27017/meuEcommerceDB
 ENV PORT=3000
 
 EXPOSE ${PORT}

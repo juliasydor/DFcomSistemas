@@ -17,6 +17,7 @@ import {
   Calendar,
   Edit,
   Trash2,
+  ImageIcon,
 } from "lucide-react";
 import { productService, reviewService, Product } from "@/lib/api";
 import { ReviewForm } from "@/components/review-form";
@@ -199,141 +200,103 @@ export function ProductDetail({ productId }: ProductDetailProps) {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-12">
-          <div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="relative w-full h-[400px] rounded-xl overflow-hidden bg-slate-800/50">
             {product.imageUrl ? (
-              <div className="relative w-full h-96 rounded-2xl overflow-hidden group">
-                <Image
-                  src={product.imageUrl || "/placeholder.svg"}
-                  alt={product.name}
-                  fill
-                  className="object-cover transition-transform duration-500 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
-              </div>
+              <Image
+                src={product.imageUrl}
+                alt={product.name}
+                fill
+                className="object-cover"
+                priority
+              />
             ) : (
-              <div className="w-full h-96 bg-gradient-to-br from-slate-700 to-slate-800 rounded-2xl flex items-center justify-center"></div>
+              <div className="w-full h-full flex items-center justify-center">
+                <ImageIcon className="h-24 w-24 text-slate-600" />
+              </div>
             )}
           </div>
 
-          <div className="space-y-6">
-            <div>
-              <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+          <Card className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 border-slate-700/50 backdrop-blur-sm">
+            <CardHeader>
+              <CardTitle className="text-2xl font-bold text-white">
                 {product.name}
-              </h1>
-
-              <p className="text-slate-300 text-lg mb-6 leading-relaxed">
-                {product.description}
-              </p>
-
-              <div className="text-4xl font-bold mb-6 bg-gradient-to-r from-green-400 to-emerald-400 bg-clip-text text-transparent">
-                ${product.price}
-              </div>
-
-              <div className="flex items-center space-x-4 text-sm text-slate-400">
-                <div className="flex items-center space-x-1">
-                  <Calendar className="h-4 w-4" />
-                  <span>
-                    Added {new Date(product.createdAt).toLocaleDateString()}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-gray-300 mb-6">{product.description}</p>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-3xl font-bold text-purple-400">
+                    R$ {product.price.toFixed(2)}
                   </span>
+                  <div className="flex items-center space-x-2">
+                    <Star className="h-5 w-5 text-yellow-400 fill-current" />
+                    <span className="text-yellow-400 font-semibold">
+                      {averageRating?.averageRating.toFixed(1) || "0.0"}
+                    </span>
+                    <span className="text-gray-400">
+                      ({averageRating?.totalReviews || 0} reviews)
+                    </span>
+                  </div>
+                </div>
+                <Separator className="bg-slate-700/50" />
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="flex items-center space-x-2">
+                    <TrendingUp className="h-5 w-5 text-green-400" />
+                    <span className="text-gray-300">In Stock</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Users className="h-5 w-5 text-blue-400" />
+                    <span className="text-gray-300">
+                      {averageRating?.totalReviews || 0} Reviews
+                    </span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <MessageSquare className="h-5 w-5 text-purple-400" />
+                    <span className="text-gray-300">Active Discussion</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Calendar className="h-5 w-5 text-pink-400" />
+                    <span className="text-gray-300">
+                      Added {new Date(product.createdAt).toLocaleDateString()}
+                    </span>
+                  </div>
                 </div>
               </div>
-            </div>
-
-            {averageRating && (
-              <Card className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 border-slate-700/50 backdrop-blur-sm">
-                <CardHeader>
-                  <CardTitle className="text-lg text-white flex items-center space-x-2">
-                    <Users className="h-5 w-5 text-purple-400" />
-                    <span>Community Reviews</span>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
-                      <div className="flex items-center">
-                        {[1, 2, 3, 4, 5].map((star) => (
-                          <Star
-                            key={star}
-                            className={`h-6 w-6 ${
-                              star <= averageRating.averageRating
-                                ? "fill-yellow-400 text-yellow-400"
-                                : "text-slate-600"
-                            }`}
-                          />
-                        ))}
-                      </div>
-                      <span className="text-2xl font-semibold text-white">
-                        {averageRating.averageRating > 0
-                          ? averageRating.averageRating.toFixed(1)
-                          : "New"}
-                      </span>
-                    </div>
-
-                    <div className="flex items-center space-x-4 text-slate-300">
-                      <div className="flex items-center space-x-1">
-                        <MessageSquare className="h-4 w-4" />
-                        <span>{averageRating.totalReviews} reviews</span>
-                      </div>
-                      <div className="flex items-center space-x-1">
-                        <TrendingUp className="h-4 w-4" />
-                        <span>Trending</span>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-          </div>
+            </CardContent>
+          </Card>
         </div>
 
-        <Separator className="my-12 bg-purple-500/20" />
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          <div className="bg-black/20 backdrop-blur-sm rounded-2xl border border-purple-500/20 p-8">
-            <h2 className="text-2xl font-bold mb-6 text-white flex items-center space-x-2">
-              <MessageSquare className="h-6 w-6 text-purple-400" />
-              <span>Write a Review</span>
-            </h2>
-            <ReviewForm
-              productId={productId}
-              onReviewCreated={handleReviewCreated}
-            />
-          </div>
-
-          <div className="bg-black/20 backdrop-blur-sm rounded-2xl border border-purple-500/20 p-8">
-            <h2 className="text-2xl font-bold mb-6 text-white flex items-center space-x-2">
-              <Users className="h-6 w-6 text-purple-400" />
-              <span>Community Feedback</span>
-            </h2>
-            <ReviewList
-              productId={productId}
-              key={refreshReviews}
-              onReviewUpdated={handleReviewCreated}
-            />
-          </div>
+        <div className="mt-8">
+          <ReviewForm
+            productId={productId}
+            onReviewCreated={handleReviewCreated}
+          />
         </div>
+
+        <div className="mt-8">
+          <ReviewList productId={productId} />
+        </div>
+
+        {showEditModal && (
+          <EditProductModal
+            product={product}
+            onClose={() => setShowEditModal(false)}
+            onProductUpdated={handleProductUpdated}
+          />
+        )}
+
+        {showDeleteModal && (
+          <DeleteConfirmModal
+            onCancel={() => setShowDeleteModal(false)}
+            onConfirm={handleDeleteProduct}
+            title="Delete Product"
+            description="Are you sure you want to delete this product? This action cannot be undone."
+            loading={deleting}
+          />
+        )}
       </div>
-
-      {/* Edit Product Modal */}
-      {showEditModal && (
-        <EditProductModal
-          product={product}
-          onClose={() => setShowEditModal(false)}
-          onProductUpdated={handleProductUpdated}
-        />
-      )}
-
-      {/* Delete Product Modal */}
-      {showDeleteModal && (
-        <DeleteConfirmModal
-          title="Delete Product"
-          description={`Are you sure you want to delete "${product.name}"? This action cannot be undone and will also delete all reviews for this product.`}
-          onConfirm={handleDeleteProduct}
-          onCancel={() => setShowDeleteModal(false)}
-          loading={deleting}
-        />
-      )}
     </div>
   );
 }

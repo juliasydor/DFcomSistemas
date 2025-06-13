@@ -4,8 +4,9 @@ import { useEffect, useState } from "react";
 import { Product, productService } from "@/lib/api";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Star, Package, AlertCircle, RefreshCw } from "lucide-react";
+import { Star, Package, AlertCircle, RefreshCw, ImageIcon } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 
 export function ProductList() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -108,6 +109,20 @@ export function ProductList() {
         {products.map((product) => (
           <Link key={product.id} href={`/products/${product.id}`}>
             <Card className="bg-gradient-to-br from-purple-900/30 to-pink-900/30 border-purple-500/20 backdrop-blur-sm hover:shadow-2xl hover:shadow-purple-500/20 transition-all duration-300 cursor-pointer group">
+              <div className="relative w-full h-48 overflow-hidden">
+                {product.imageUrl ? (
+                  <Image
+                    src={product.imageUrl}
+                    alt={product.name}
+                    fill
+                    className="object-cover transition-transform group-hover:scale-105"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center bg-slate-800/50">
+                    <ImageIcon className="h-12 w-12 text-slate-600" />
+                  </div>
+                )}
+              </div>
               <CardHeader>
                 <CardTitle className="text-lg font-semibold text-white group-hover:text-purple-300 transition-colors">
                   {product.name}

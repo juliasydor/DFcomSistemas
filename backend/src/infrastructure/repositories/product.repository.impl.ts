@@ -26,6 +26,7 @@ export class ProductRepositoryMongo implements IProductRepository {
       productDoc.description,
       productDoc.price,
       productDoc.stock,
+      productDoc.imageUrl,
       id,
       productDoc.createdAt,
       productDoc.updatedAt,

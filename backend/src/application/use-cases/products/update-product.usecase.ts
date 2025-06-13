@@ -30,6 +30,7 @@ export class UpdateProductUseCase {
         updateProductDto.description,
         updateProductDto.price,
         updateProductDto.stock,
+        updateProductDto.imageUrl,
       );
 
       const updatedProduct = await this.productRepository.update(

@@ -6,6 +6,7 @@ export class Product {
   description: string;
   price: number;
   stock: number;
+  imageUrl?: string;
   createdAt: Date;
   updatedAt: Date;
 
@@ -14,6 +15,7 @@ export class Product {
     description: string,
     price: number,
     stock: number,
+    imageUrl?: string,
     id?: string,
     createdAt?: Date,
     updatedAt?: Date,
@@ -23,6 +25,7 @@ export class Product {
     this.description = description;
     this.price = price;
     this.stock = stock;
+    this.imageUrl = imageUrl;
     this.createdAt = createdAt || new Date();
     this.updatedAt = updatedAt || new Date();
 
@@ -46,11 +49,13 @@ export class Product {
     description?: string,
     price?: number,
     stock?: number,
+    imageUrl?: string,
   ): void {
     if (name !== undefined) this.name = name;
     if (description !== undefined) this.description = description;
     if (price !== undefined) this.price = price;
     if (stock !== undefined) this.stock = stock;
+    if (imageUrl !== undefined) this.imageUrl = imageUrl;
     this.updatedAt = new Date();
     this.validate();
   }

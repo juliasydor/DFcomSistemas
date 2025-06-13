@@ -6,6 +6,7 @@ export interface ProductDocument extends Document {
   description: string;
   price: number;
   stock: number;
+  imageUrl?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -23,6 +24,9 @@ export class ProductModel {
 
   @Prop({ required: true })
   stock!: number;
+
+  @Prop()
+  imageUrl?: string;
 }
 
 export const ProductSchema = SchemaFactory.createForClass(ProductModel);

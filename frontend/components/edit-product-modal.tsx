@@ -34,7 +34,7 @@ export function EditProductModal({
     name: product.name,
     description: product.description,
     price: product.price.toString(),
-    category: product.category,
+    stock: product.stock.toString(),
     imageUrl: product.imageUrl || "",
   });
   const [loading, setLoading] = useState(false);
@@ -56,15 +56,20 @@ export function EditProductModal({
       !formData.name.trim() ||
       !formData.description.trim() ||
       !formData.price ||
-      !formData.category.trim()
+      formData.stock === ""
     ) {
       toast.error("Please fill in all required fields");
       return;
     }
 
     const price = Number.parseFloat(formData.price);
+    const stock = Number.parseInt(formData.stock, 10);
     if (isNaN(price) || price < 0) {
       toast.error("Please enter a valid price");
+      return;
+    }
+    if (isNaN(stock) || stock < 0) {
+      toast.error("Please enter a valid stock (0 or more)");
       return;
     }
 
@@ -74,7 +79,7 @@ export function EditProductModal({
         name: formData.name.trim(),
         description: formData.description.trim(),
         price,
-        category: formData.category.trim(),
+        stock,
         imageUrl: formData.imageUrl.trim() || undefined,
       });
 
@@ -171,18 +176,20 @@ export function EditProductModal({
 
             <div>
               <Label
-                htmlFor="category"
+                htmlFor="stock"
                 className="text-white flex items-center space-x-2 mb-2"
               >
-                <Tag className="h-4 w-4 text-blue-400" />
-                <span>Category *</span>
+                <Tag className="h-4 w-4 text-yellow-400" />
+                <span>Stock *</span>
               </Label>
               <Input
-                id="category"
-                name="category"
-                value={formData.category}
+                id="stock"
+                name="stock"
+                type="number"
+                min="0"
+                value={formData.stock}
                 onChange={handleChange}
-                placeholder="e.g., Electronics, Gaming"
+                placeholder="0"
                 required
                 className="bg-slate-800/50 border-slate-600/50 text-white placeholder:text-slate-400 focus:border-purple-500/50"
               />
@@ -203,38 +210,28 @@ export function EditProductModal({
               type="url"
               value={formData.imageUrl}
               onChange={handleChange}
-              placeholder="https://example.com/image.jpg"
+              placeholder="https://example.com/product-image.jpg"
               className="bg-slate-800/50 border-slate-600/50 text-white placeholder:text-slate-400 focus:border-purple-500/50"
             />
           </div>
 
-          <div className="flex items-center space-x-3 pt-4">
-            <Button
-              type="submit"
-              disabled={loading}
-              className="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
-            >
-              {loading ? (
-                <div className="flex items-center space-x-2">
-                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                  <span>Updating...</span>
-                </div>
-              ) : (
-                <div className="flex items-center space-x-2">
-                  <Save className="h-4 w-4" />
-                  <span>Update Product</span>
-                </div>
-              )}
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={onClose}
-              className="border-slate-600 text-slate-300 hover:bg-slate-700"
-            >
-              Cancel
-            </Button>
-          </div>
+          <Button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white shadow-lg hover:shadow-blue-500/25 transition-all duration-300"
+          >
+            {loading ? (
+              <div className="flex items-center space-x-2">
+                <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                <span>Saving...</span>
+              </div>
+            ) : (
+              <div className="flex items-center space-x-2">
+                <Save className="h-4 w-4" />
+                <span>Save Changes</span>
+              </div>
+            )}
+          </Button>
         </form>
       </div>
     </div>

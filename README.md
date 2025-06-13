@@ -27,6 +27,14 @@ Antes de começar, certifique-se de ter o seguinte instalado:
 - [npm](https://www.npmjs.com/) (vem com o Node.js)
 - [Docker Desktop](https://www.docker.com/products/docker-desktop) (para executar o backend e o banco de dados em containers)
 
+### 1. Clonando o Repositório
+
+Clone o repositório do projeto para sua máquina local:
+
+```bash
+git clone https://github.com/juliasydor/DFcomSistemas.git
+```
+
 ### Configuração do Backend
 
 O backend é construído com NestJS e utiliza MongoDB como banco de dados. Ambos são executados em containers Docker.

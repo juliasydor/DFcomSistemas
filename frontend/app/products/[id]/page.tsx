@@ -4,6 +4,7 @@ interface ProductPageProps {
   params: { id: string };
 }
 
-export default function ProductPage({ params }: ProductPageProps) {
+export default async function ProductPage(props: ProductPageProps) {
+  const params = await props.params;
   return <ProductDetail productId={params.id} />;
 }

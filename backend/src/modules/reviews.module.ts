@@ -6,24 +6,28 @@ import { ListReviewsByProductUseCase } from '@application/use-cases/reviews/list
 import { GetAverageRatingUseCase } from '@application/use-cases/reviews/get-average-rating.usecase';
 import { IReviewRepository } from '@domain/reviews/repositories/review.repository';
 import { ReviewRepositoryMongo } from '@infrastructure/repositories/review.repository.impl';
+import { UpdateReviewUseCase } from '@application/use-cases/reviews/update-review.usecase';
+import { DeleteReviewUseCase } from '@application/use-cases/reviews/delete-review.usecase';
 import {
   ReviewModel,
   ReviewSchema,
 } from '@infrastructure/database/schemas/review.schema';
-import { ProductsModule } from './products.module'; // Import ProductsModule to use IProductRepository
+import { ProductsModule } from './products.module';
 
 @Module({
   imports: [
     MongooseModule.forFeature([
       { name: ReviewModel.name, schema: ReviewSchema },
     ]),
-    ProductsModule, // Make IProductRepository available
+    ProductsModule,
   ],
   controllers: [ReviewController],
   providers: [
     CreateReviewUseCase,
     ListReviewsByProductUseCase,
     GetAverageRatingUseCase,
+    UpdateReviewUseCase,
+    DeleteReviewUseCase,
     {
       provide: IReviewRepository,
       useClass: ReviewRepositoryMongo,

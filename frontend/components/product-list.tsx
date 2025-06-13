@@ -1,141 +1,134 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
+import { Product, productService } from "@/lib/api";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Star, Package, AlertCircle, RefreshCw } from "lucide-react";
 import Link from "next/link";
-import Image from "next/image";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Star, Loader2 } from "lucide-react";
-import { productService, reviewService } from "@/lib/api";
-
-interface Product {
-  id: string;
-  name: string;
-  description: string;
-  price: number;
-  stock: number;
-  createdAt: string;
-  updatedAt: string;
-}
-
-interface ProductWithRating extends Product {
-  averageRating: number;
-}
 
 export function ProductList() {
-  const [products, setProducts] = useState<ProductWithRating[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const fetchProducts = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const data = await productService.getAll();
+      setProducts(data);
+    } catch (err) {
+      console.error("Error fetching products:", err);
+      setError(
+        err instanceof Error ? err.message : "Erro ao carregar produtos"
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        console.log("Starting to fetch products..."); // Debug log
-        setLoading(true);
-        const productsData = await productService.getAll();
-        console.log("Products fetched:", productsData); // Debug log
-
-        // Fetch ratings for each product
-        const productsWithRatings = await Promise.all(
-          productsData.map(async (product: Product) => {
-            try {
-              const rating = await reviewService.getAverageRating(product.id);
-              return {
-                ...product,
-                averageRating: rating.averageRating,
-              };
-            } catch (error) {
-              console.error(
-                `Error fetching rating for product ${product.id}:`,
-                error
-              );
-              return {
-                ...product,
-                averageRating: 0,
-              };
-            }
-          })
-        );
-
-        console.log("Products with ratings:", productsWithRatings); // Debug log
-        setProducts(productsWithRatings);
-      } catch (err) {
-        console.error("Error in fetchProducts:", err); // Debug log
-        setError(
-          err instanceof Error ? err.message : "Failed to load products"
-        );
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchProducts();
   }, []);
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-12">
-        <Loader2 className="h-8 w-8 animate-spin" />
-        <span className="ml-2">Loading products...</span>
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center">
+          <Package className="h-16 w-16 text-purple-400 animate-pulse mx-auto mb-4" />
+          <p className="text-purple-300 text-lg">Carregando produtos...</p>
+        </div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="text-center py-12">
-        <p className="text-destructive">{error}</p>
-        <button
-          onClick={() => window.location.reload()}
-          className="mt-4 text-primary hover:underline"
-        >
-          Try again
-        </button>
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center max-w-md">
+          <AlertCircle className="h-16 w-16 text-red-400 mx-auto mb-4" />
+          <h3 className="text-xl font-semibold text-red-400 mb-2">
+            Erro ao carregar produtos
+          </h3>
+          <p className="text-gray-300 mb-4">{error}</p>
+          <div className="space-y-2">
+            <Button
+              onClick={fetchProducts}
+              className="bg-purple-600 hover:bg-purple-700 text-white"
+            >
+              <RefreshCw className="h-4 w-4 mr-2" />
+              Tentar Novamente
+            </Button>
+            <p className="text-sm text-gray-400 mt-2">
+              Certifique-se de que o servidor backend está rodando
+            </p>
+          </div>
+        </div>
       </div>
     );
   }
 
   if (products.length === 0) {
     return (
-      <div className="text-center py-12">
-        <p className="text-muted-foreground">No products found.</p>
-        <Link href="/products/create" className="text-primary hover:underline">
-          Create the first product
-        </Link>
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center">
+          <Package className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+          <h3 className="text-xl font-semibold text-gray-300 mb-2">
+            Nenhum produto encontrado
+          </h3>
+          <p className="text-gray-400 mb-4">
+            Comece adicionando seu primeiro produto!
+          </p>
+          <Link href="/products/create">
+            <Button className="bg-purple-600 hover:bg-purple-700 text-white">
+              Adicionar Produto
+            </Button>
+          </Link>
+        </div>
       </div>
     );
   }
 
   return (
     <div>
-      <h2 className="text-2xl font-bold mb-6">All Products</h2>
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-2xl font-bold text-white">Produtos Disponíveis</h2>
+        <Button
+          onClick={fetchProducts}
+          variant="outline"
+          size="sm"
+          className="text-purple-300 border-purple-500/50 hover:bg-purple-500/10"
+        >
+          <RefreshCw className="h-4 w-4" />
+        </Button>
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {products.map((product) => (
           <Link key={product.id} href={`/products/${product.id}`}>
-            <Card className="h-full hover:shadow-lg transition-shadow cursor-pointer">
+            <Card className="bg-gradient-to-br from-purple-900/30 to-pink-900/30 border-purple-500/20 backdrop-blur-sm hover:shadow-2xl hover:shadow-purple-500/20 transition-all duration-300 cursor-pointer group">
               <CardHeader>
-                <CardTitle className="line-clamp-2">{product.name}</CardTitle>
-                <CardDescription className="line-clamp-3">
-                  {product.description}
-                </CardDescription>
+                <CardTitle className="text-lg font-semibold text-white group-hover:text-purple-300 transition-colors">
+                  {product.name}
+                </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-2xl font-bold">${product.price}</span>
-                  <Badge variant="secondary">Stock: {product.stock}</Badge>
+                <p className="text-gray-300 text-sm mb-3 line-clamp-2">
+                  {product.description}
+                </p>
+                <div className="flex items-center justify-between">
+                  <span className="text-2xl font-bold text-purple-400">
+                    R$ {product.price.toFixed(2)}
+                  </span>
+                  <div className="flex items-center space-x-1 text-yellow-400">
+                    <Star className="h-4 w-4 fill-current" />
+                    <span className="text-sm">4.5</span>
+                  </div>
                 </div>
-                <div className="flex items-center space-x-1">
-                  <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                  <span className="text-sm font-medium">
-                    {product.averageRating > 0
-                      ? product.averageRating.toFixed(1)
-                      : "No ratings"}
+                <div className="mt-3 flex items-center justify-between text-sm">
+                  <span className="text-gray-400">
+                    Estoque: {product.stock}
                   </span>
                 </div>
               </CardContent>
